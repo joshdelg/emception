@@ -54,4 +54,4 @@ docker rm $CONTAINER_ID
 
 popd
 
-node "$SRC/split_packages.js" | bash
+node "$SRC/split_packages.cjs" | bash
