@@ -26,6 +26,7 @@ export default class FileSystem extends EmProcess {
     }
 
     unpack(path, cwd = "/") {
+	console.log("Unpacking path ", path);
         if (path.endsWith(".br")) {
             // it's a brotli file, decompress it first
             this._brotli.exec(["brotli", "--decompress", "-o", "/tmp/archive.pack", path], { cwd: "/tmp/" });
@@ -34,6 +35,7 @@ export default class FileSystem extends EmProcess {
         } else {
             this.exec(["wasm-package", "unpack", path], { cwd });
         }
+	console.log("Finished unpacking path", path);
     }
 
     #cachedDownload(url, async = false) {
@@ -84,11 +86,14 @@ export default class FileSystem extends EmProcess {
     }
 
     preloadLazy(path, async = true) {
-        const [root, url, packaged] = this.#lazyLoads.get(path);
+        console.log("Preloading lazy module", path);
+	const [root, url, packaged] = this.#lazyLoads.get(path);
+	console.log(`Got ${root}, ${url}, ${packaged}`);
         return this.#lazyLoad(root, url, packaged, async);
     }
 
     cachedLazyFolder(path, url, mode = 0o777, package_root = path) {
+	console.log("Caching lazy folder", path);
         this.#lazyLoads.set(path, [package_root, url, true]);
         this.#ignorePermissions(() => {
             createLazyFolder(this.FS, path, mode, () => this.preloadLazy(path, false));
@@ -122,6 +127,7 @@ export default class FileSystem extends EmProcess {
         return this.FS.writeFile(...args)
     }
     symlink(oldPath, newPath) {
+	console.log(`Making symlink ${oldPath}:${newPath}`);
         return this.FS.symlink(oldPath, newPath);
     }
 

@@ -55,11 +55,17 @@ class Emception {
     tools = {};
 
     async init() {
+	console.log("Entering emception init function");
+
         const fileSystem = await new FileSystem();
         this.fileSystem = fileSystem;
+	
+	console.log("Initted filesystem");
 
         fileSystem.mkdirTree("/lazy");
-        for (const [name, url] of Object.entries(packs)) {
+        console.log("Made dir tree with /lazy");
+	
+	for (const [name, url] of Object.entries(packs)) {
             fileSystem.cachedLazyFolder(`/lazy/${name}`, url, 0o777, `/lazy/${name}`);
         }
 
@@ -67,8 +73,12 @@ class Emception {
         fileSystem.symlink("/lazy/emscripten", "/emscripten");
         fileSystem.symlink("/lazy/cpython", "/usr/local/lib");
         fileSystem.symlink("/lazy/wasm", "/wasm");
+	
+	console.log("Made /usr/local dir tree and made symlinks");
 
         await Promise.all(preloads.map((preload) => fileSystem.preloadLazy(`/lazy/${preload}`)));
+	
+	console.log("Finished lazy preloading");
 
         fileSystem.mkdirTree("/working");
 
@@ -77,6 +87,8 @@ class Emception {
             // Emscripten checks the existence of a few of these files
             fileSystem.writeFile(tool, "");
         }
+
+	console.log("Finished making /working and /usr/bin, and making fake files");
 
         const processConfig = {
             FS: fileSystem.FS,
